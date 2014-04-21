@@ -202,7 +202,7 @@ static int dvd_file_open(URLContext *h, const char *filename, int flags)
   return -1;
 }
 */
-
+/*
 static AVPacket* get_single_frame( AVFormatContext* fmt_ctx, int streamid)
 {
   static AVPacket pkt;
@@ -225,6 +225,52 @@ static AVPacket* get_single_frame( AVFormatContext* fmt_ctx, int streamid)
       _continue = 0;
     } while (_continue == 1);  
     
+  return &pkt;
+}
+*/
+
+
+static AVPacket* get_single_frame( AVFormatContext* fmt_ctx, int streamid)
+{
+    
+  FILE * DSTFILE;
+  static AVPacket pkt;
+  int _continue = 1;
+    
+  av_init_packet(&pkt);
+  pkt.data = NULL;
+  pkt.size = 0;
+  
+  AVCodecContext  *audio_dec_ctx;
+  audio_dec_ctx = fmt_ctx->streams[streamid]->codec;
+  char  file_name[512];
+  memset(file_name, 0, 512);
+  char dst_prefix[] = "/home/sasha/dump_";
+  char buffer_id[20];
+  sprintf(buffer_id, "%d", streamid);
+  strcat(file_name, dst_prefix);
+  strcat(file_name, buffer_id);
+  strcat(file_name, ".");
+  strcat(file_name, avcodec_get_name(audio_dec_ctx->codec_id));
+ DSTFILE= fopen(file_name, "wb");
+ 
+ int loop = 0;
+  do 
+  {
+    if(av_read_frame(fmt_ctx, &pkt) >= 0)
+    {
+      if(pkt.stream_index == streamid)
+      {	
+        fwrite(pkt.data, 1, pkt.size, DSTFILE);
+        loop++;
+        if(loop > 5000)
+          _continue = 0;
+      }
+    }
+    else
+      _continue = 0;
+    } while (_continue == 1);  
+  fclose(DSTFILE);
   return &pkt;
 }
 
@@ -1137,8 +1183,8 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int iId)
           st->m_description = m_dllAvUtil.av_dict_get(pStream->metadata, "title", NULL, 0)->value;
         
         //TODO : if (profile == FF_PROFILE_DTS_HD_HRA)
-        if(pStream->codec->profile == FF_PROFILE_DTS_HD_MA)
-        {
+        //if(pStream->codec->profile == FF_PROFILE_DTS_HD_MA)
+        //{
           CLog::Log(LOGINFO, "%s : Searching for extended stream info", __FUNCTION__);
           AVPacket* pkt = get_single_frame( m_pFormatContext, iId);
           if(pkt->data != NULL)
@@ -1153,7 +1199,7 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int iId)
           }
           else
             CLog::Log(LOGINFO, "%s : No frame returned by get_single_frame", __FUNCTION__);
-        }
+        //}
         
         break;
       }
