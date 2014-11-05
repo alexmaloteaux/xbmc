@@ -928,3 +928,4 @@ lib/cpluff/stamp-h1
 /addons/library.xbmc.pvr/libXBMC_pvr.lib
 
 /pvr-addons
+tools/depends/target/ffmpeg/ffmpeg-2.4.2-*
