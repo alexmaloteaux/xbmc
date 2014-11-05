@@ -481,7 +481,10 @@ void CSelectionStreams::Update(CDVDInputStream* input, CDVDDemux* demuxer, std::
             s.name += " - ";
           s.name += type;
         }
-        s.channels = ((CDemuxStreamAudio*)stream)->iChannels;
+        if(((CDemuxStreamAudio*)stream)->bExtendedStreamInfo)
+          s.channels = ((CDemuxStreamAudio*)stream)->iExtendedChannels;
+        else
+          s.channels = ((CDemuxStreamAudio*)stream)->iChannels;
       }
       if (!s.filename2.empty())
         s.name += " " + g_localizeStrings.Get(21602);
