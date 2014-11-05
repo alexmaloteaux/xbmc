@@ -1080,11 +1080,6 @@ bool CApplication::InitDirectoriesLinux()
   else
     userName = "root";
 
-  std::string userHome;
-  if (getenv("HOME"))
-    userHome = getenv("HOME");
-  else
-    userHome = "/root";
 
   std::string appBinPath, appPath;
   std::string appName = CCompileInfo::GetAppName();
@@ -1118,17 +1113,34 @@ bool CApplication::InitDirectoriesLinux()
   /* Set some environment variables */
   setenv(envAppBinHome, appBinPath.c_str(), 0);
   setenv(envAppHome, appPath.c_str(), 0);
-
+  
+  // map our special drives
+  CSpecialProtocol::SetXBMCBinPath(appBinPath);
+  CSpecialProtocol::SetXBMCPath(appPath);
+    
+  std::string userHome;
+  
   if (m_bPlatformDirectories)
   {
-    // map our special drives
-    CSpecialProtocol::SetXBMCBinPath(appBinPath);
-    CSpecialProtocol::SetXBMCPath(appPath);
-    CSpecialProtocol::SetHomePath(userHome + "/" + dotLowerAppName);
-    CSpecialProtocol::SetMasterProfilePath(userHome + "/" + dotLowerAppName + "/userdata");
+    if (getenv("KODI_USER_HOME"))
+      userHome = getenv("KODI_USER_HOME");
+    else
+    {
+      if (getenv("HOME"))
+        userHome = getenv("HOME");
+      else
+        userHome = "/root";
+      
+      userHome = userHome + "/" + dotLowerAppName;
+    }
+      
 
-    CStdString strTempPath = userHome;
-    strTempPath = URIUtils::AddFileToFolder(strTempPath, dotLowerAppName + "/temp");
+    CSpecialProtocol::SetHomePath(userHome);
+    CSpecialProtocol::SetMasterProfilePath(userHome + "/userdata");
+
+    CStdString strTempPath ;
+    strTempPath = URIUtils::AddFileToFolder(userHome, "/temp");
+    
     if (getenv(envAppTemp))
       strTempPath = getenv(envAppTemp);
     CSpecialProtocol::SetTempPath(strTempPath);
