@@ -4057,7 +4057,11 @@ void CDVDPlayer::GetAudioStreamInfo(int index, SPlayerAudioStreamInfo &info)
     if (stream)
     {
       info.bitrate = stream->iBitRate;
-      info.channels = stream->iChannels;
+      //For videoplayer.audiochannels
+      if(stream->bExtendedStreamInfo)
+        info.channels = stream->iExtendedChannels;
+      else
+        info.channels = stream->iChannels;
     }
   }
 
