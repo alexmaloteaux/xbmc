@@ -45,7 +45,6 @@
 #include "utils/log.h"
 #include "threads/SystemClock.h"
 #include "utils/StringUtils.h"
-#include "utils/fastmemcpy.h"
 #include "URL.h"
 #include "cores/FFmpeg.h"
 
@@ -1186,7 +1185,7 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int iId)
               Frame frame;
               frame.size = pkt->size;
               frame.data = (unsigned char *)malloc(frame.size * sizeof(unsigned char));
-              fast_memcpy(frame.data, pkt->data, frame.size);
+              memcpy(frame.data, pkt->data, frame.size);
               st->GetExtendedStreamInfo(AV_CODEC_ID_DTS , &frame);
               free(frame.data);
               av_free_packet(pkt);

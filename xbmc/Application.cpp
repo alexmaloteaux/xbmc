@@ -889,6 +889,14 @@ bool CApplication::InitDirectoriesLinux()
   else
     userName = "root";
 
+  std::string appBinPath, appPath;
+  std::string appName = CCompileInfo::GetAppName();
+  std::string dotLowerAppName = "." + appName;
+  StringUtils::ToLower(dotLowerAppName);
+  const char* envAppHome = "KODI_HOME";
+  const char* envAppBinHome = "KODI_BIN_HOME";
+  const char* envAppTemp = "KODI_TEMP";
+
   std::string userHome;
   if (getenv("KODI_USER_HOME"))
     userHome = getenv("KODI_USER_HOME");
@@ -901,14 +909,6 @@ bool CApplication::InitDirectoriesLinux()
 
     userHome = userHome + "/" + dotLowerAppName ;
   }
-
-  std::string appBinPath, appPath;
-  std::string appName = CCompileInfo::GetAppName();
-  std::string dotLowerAppName = "." + appName;
-  StringUtils::ToLower(dotLowerAppName);
-  const char* envAppHome = "KODI_HOME";
-  const char* envAppBinHome = "KODI_BIN_HOME";
-  const char* envAppTemp = "KODI_TEMP";
 
   CUtil::GetHomePath(appBinPath, envAppBinHome);
   if (getenv(envAppHome))
